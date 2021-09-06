@@ -23,10 +23,13 @@ coverage
 
 # production
 build
+./packages/hardhat/mnemonic.txt
+./packages/hardhat/0x05d95cff844535b7ec0b5142195df75a3a325708.txt
 
 # misc
 .DS_Store
 .env*
+.eslintrc.js
 
 # debug
 npm-debug.log*
