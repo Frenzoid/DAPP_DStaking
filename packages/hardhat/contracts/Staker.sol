@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity >=0.4.22 <0.9.0;
+pragma solidity >=0.6.0 <0.9.0;
 
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol"; //https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol
@@ -13,11 +13,11 @@ contract Staker is Ownable {
     uint256 bal;
   }
 
-  // Array of balances of users.
-  Gambler[] public gamblers;
+  // Array of balances of users (because we will want to iterate over them).
+  mapping(uint256 => Gambler) public gamblers;
 
   // stakers count.
-  uint256 gamblerCount;
+  uint256 public gamblerCount;
 
   // Threshold.
   uint256 public threshold;
@@ -26,9 +26,9 @@ contract Staker is Ownable {
   uint256 public deadline;
 
   // completed
-  bool completed;
+  bool public completed;
 
-
+  
 
   // - Events.
   event Stake(address user, uint256 amount);
@@ -56,9 +56,9 @@ contract Staker is Ownable {
 
   // - Constructor
   constructor() public {
-    gamblerCount = 0;
+    gamblerCount = 1;
     threshold = 1 ether;
-    deadline = now + 5 minutes;
+    deadline = block.timestamp + 5 minutes;
     completed = false;
   }
 
@@ -68,11 +68,13 @@ contract Staker is Ownable {
   // Staker function, users will use this function to stake their eth.
   function stake() public payable notCompleted deadlineNotPassed{
     (uint256 index, bool found) = findUserIndex(msg.sender);
+    console.log(index);
 
     if (found) {
       gamblers[index].bal += msg.value;
     } else {
       gamblers[gamblerCount] = Gambler(msg.sender, msg.value);
+
       gamblerCount++;
     }
 
@@ -88,7 +90,6 @@ contract Staker is Ownable {
     require(address(this).balance >= threshold, "DSA: Can't execute yet, treshold hasn't been met.");
 
     completed = true;
-
     emit Completed(address(this).balance);
 
     (bool success, ) = owner().call{value: address(this).balance}("");
@@ -116,7 +117,14 @@ contract Staker is Ownable {
 
   // Returns the time left of the deadline.
   function timeLeft() public view returns (uint256) {
-    return (now >= deadline) ? 0 : deadline - now;
+    return (block.timestamp >= deadline) ? 0 : deadline - block.timestamp;
+  }
+
+  // Returns the staked balance of the caller.
+  function stakedBalance(address _user) public view returns (uint256) {
+    (uint256 index, bool found) = findUserIndex(_user);
+    require(found, "DSA: You dont have funds staked.");
+    return gamblers[index].bal;
   }
 
 
@@ -127,7 +135,7 @@ contract Staker is Ownable {
     require(_treshold > 0, "DSA: treshold must be atleast 1.");
 
     completed = false;
-    deadline = now + ( _stakingPeriod * 1 minutes );
+    deadline = block.timestamp + ( _stakingPeriod * 1 minutes );
 
     setTreshold(_treshold);
 
@@ -160,19 +168,22 @@ contract Staker is Ownable {
   // - Internal methods.
   // Clears the mappings.
   function clear() internal {
-    for(uint256 i = gamblerCount; gamblerCount >= 0; i--) {
+    for(uint256 i = gamblerCount; i > 0; i--) {
       delete gamblers[i];
     }
 
-    gamblerCount = 0;
+    gamblerCount = 1;
   }
 
   // Finds a user inside the mapping 
   function findUserIndex(address _addr) internal view returns (uint256, bool) {
+    require(_addr != address(0), "DSA: Invalid Address.");
+    if(gamblerCount == 0) return (0, false);
 
-    for(uint256 i = gamblerCount; gamblerCount >= 0; i--){
-      if(gamblers[i].addr == _addr){
-         return (i, true);
+    for(uint256 i = gamblerCount; i > 0; i--){
+      if(gamblers[i].addr == _addr) {
+          console.log(gamblers[i].addr);
+          return (i, true);
       }
     }
 

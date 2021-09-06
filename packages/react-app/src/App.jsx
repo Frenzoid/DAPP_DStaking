@@ -12,7 +12,6 @@ import { useExchangePrice, useGasPrice, useUserProvider, useContractLoader, useC
 import { Header, Account, Faucet, Ramp, Contract, GasGauge, Balance, Address } from "./components";
 import { Transactor } from "./helpers";
 import { formatEther, parseEther } from "@ethersproject/units";
-import Countdown from 'react-countdown';
 import { Hints, ExampleUI, Subgraph } from "./views"
 import { INFURA_ID, DAI_ADDRESS, DAI_ABI, NETWORK, NETWORKS } from "./constants";
 const humanizeDuration = require("humanize-duration");
@@ -113,16 +112,13 @@ function App(props) {
   //
 
   //keep track of contract balance to know how much has been staked total:
+  
   const stakerContractBalance = useBalance(localProvider, readContracts && readContracts.Staker.address);
   if(DEBUG) console.log("💵 stakerContractBalance", stakerContractBalance )
 
   //keep track of total 'threshold' needed of ETH
   const threshold = useContractReader(readContracts,"Staker", "threshold" )
   console.log("💵 threshold:",threshold)
-
-  // keep track of a variable from the contract in the local React state:
-  const balanceStaked = useContractReader(readContracts,"Staker", "balances",[ address ])
-  console.log("💸 balanceStaked:",balanceStaked)
 
   //📟 Listen for broadcast events
   const stakeEvents = useEventListener(readContracts, "Staker", "Stake", localProvider, 1);
@@ -132,24 +128,15 @@ function App(props) {
   const timeLeft = useContractReader(readContracts,"Staker", "timeLeft")
   console.log("⏳ timeLeft:",timeLeft)
 
-
-
-  const complete = useContractReader(readContracts,"ExampleExternalContract", "completed")
+  const complete = useContractReader(readContracts,"Staker", "completed")
   console.log("✅ complete:",complete)
-
-  const exampleExternalContractBalance = useBalance(localProvider, readContracts && readContracts.ExampleExternalContract.address);
-  if(DEBUG) console.log("💵 exampleExternalContractBalance", exampleExternalContractBalance )
 
 
   let completeDisplay = ""
   if(complete){
     completeDisplay = (
       <div style={{padding:64, backgroundColor:"#eeffef", fontWeight:"bolder"}}>
-        🚀 🎖 👩‍🚀  -  Staking App triggered `ExampleExternalContract` -- 🎉  🍾   🎊
-        <Balance
-          balance={exampleExternalContractBalance}
-          fontSize={64}
-        /> ETH staked!
+        🚀 🎖 👩‍🚀  - Deadline or Treshold met! Time to gamble! - 🎉  🍾   🎊
       </div>
     )
   }
@@ -258,15 +245,6 @@ function App(props) {
               fontSize={64}
             />
           </div>
-
-
-          <div style={{padding:8}}>
-            <div>You staked:</div>
-            <Balance
-              balance={balanceStaked}
-              fontSize={64}
-            />
-          </div>
   
           <div className="d-flex flex-row justify-content-center flex-wrap">
 
@@ -277,7 +255,7 @@ function App(props) {
             </div>
 
             <div style={{padding:8}}>
-              <Button type={ balanceStaked ? "success" : "primary"} onClick={()=>{
+              <Button onClick={()=>{
                 tx( writeContracts.Staker.stake({value: parseEther("0.5")}) )
               }}>🥩  Stake 0.5 ether!</Button>
             </div>
@@ -326,14 +304,6 @@ function App(props) {
           <Route path="/contracts">
             <Contract
               name="Staker"
-              signer={userProvider.getSigner()}
-              provider={localProvider}
-              address={address}
-              blockExplorer={blockExplorer}
-            />
-
-            <Contract
-              name="ExampleExternalContract"
               signer={userProvider.getSigner()}
               provider={localProvider}
               address={address}

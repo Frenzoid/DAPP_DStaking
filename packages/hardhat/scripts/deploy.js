@@ -9,9 +9,9 @@ const main = async () => {
 
   console.log("\n\n 📡 Deploying...\n");
 
-  const exampleExternalContract = await deploy("ExampleExternalContract")
+  // const exampleExternalContract = await deploy("ExampleExternalContract")
 
-  const stakerContract = await deploy("Staker",[ exampleExternalContract.address ]) // <-- add in constructor args like line 16 vvvv
+  const stakerContract = await deploy("Staker") // <-- add in constructor args like line 16 vvvv
 
 
   //const secondContract = await deploy("SecondContract")
