@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
 import "antd/dist/antd.css";
+import "bootstrap/dist/css/bootstrap.css"
 import {  JsonRpcProvider, Web3Provider } from "@ethersproject/providers";
 import "./App.css";
 import { Row, Col, Button, Menu, Alert, List } from "antd";
@@ -11,6 +12,7 @@ import { useExchangePrice, useGasPrice, useUserProvider, useContractLoader, useC
 import { Header, Account, Faucet, Ramp, Contract, GasGauge, Balance, Address } from "./components";
 import { Transactor } from "./helpers";
 import { formatEther, parseEther } from "@ethersproject/units";
+import Countdown from 'react-countdown';
 import { Hints, ExampleUI, Subgraph } from "./views"
 import { INFURA_ID, DAI_ADDRESS, DAI_ABI, NETWORK, NETWORKS } from "./constants";
 const humanizeDuration = require("humanize-duration");
@@ -37,7 +39,7 @@ const humanizeDuration = require("humanize-duration");
 const targetNetwork = NETWORKS['localhost']; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
-const DEBUG = true
+const DEBUG = false
 
 // 🛰 providers
 if(DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
@@ -222,7 +224,6 @@ function App(props) {
   return (
     <div className="App">
 
-      {/* ✏️ Edit the header and change the title to your project name */}
       <Header />
       {networkDisplay}
       <BrowserRouter>
@@ -242,6 +243,7 @@ function App(props) {
           {completeDisplay}
 
           <div style={{padding:8,marginTop:32}}>
+            
             <div>Timeleft:</div>
             {timeLeft && humanizeDuration(timeLeft.toNumber()*1000)}
           </div>
@@ -265,26 +267,28 @@ function App(props) {
               fontSize={64}
             />
           </div>
+  
+          <div className="d-flex flex-row justify-content-center flex-wrap">
 
+            <div style={{padding:8}}>
+              <Button type={"default"} onClick={()=>{
+                tx( writeContracts.Staker.execute() )
+              }}>📡  Execute!</Button>
+            </div>
 
-          <div style={{padding:8}}>
-            <Button type={"default"} onClick={()=>{
-              tx( writeContracts.Staker.execute() )
-            }}>📡  Execute!</Button>
+            <div style={{padding:8}}>
+              <Button type={ balanceStaked ? "success" : "primary"} onClick={()=>{
+                tx( writeContracts.Staker.stake({value: parseEther("0.5")}) )
+              }}>🥩  Stake 0.5 ether!</Button>
+            </div>
+
+            <div style={{padding:8}}>
+              <Button type={"default"} onClick={()=>{
+                tx( writeContracts.Staker.withdraw( address ) )
+              }}>🏧  Withdraw</Button>
+            </div>
+
           </div>
-
-          <div style={{padding:8}}>
-            <Button type={"default"} onClick={()=>{
-              tx( writeContracts.Staker.withdraw( address ) )
-            }}>🏧  Withdraw</Button>
-          </div>
-
-          <div style={{padding:8}}>
-            <Button type={ balanceStaked ? "success" : "primary"} onClick={()=>{
-              tx( writeContracts.Staker.stake({value: parseEther("0.5")}) )
-            }}>🥩  Stake 0.5 ether!</Button>
-          </div>
-
 
 
             {/*
@@ -299,12 +303,12 @@ function App(props) {
                 dataSource={stakeEvents}
                 renderItem={(item) => {
                   return (
-                    <List.Item key={item[0]+item[1]+item.blockNumber}>
+                    <List.Item key={item[0] + item[1] + item.blockNumber}>
                       <Address
                           value={item[0]}
                           ensProvider={mainnetProvider}
                           fontSize={16}
-                        /> =>
+                        /> 
                         <Balance
                           balance={item[1]}
 
@@ -317,29 +321,8 @@ function App(props) {
             </div>
 
 
-
-
-            { /* uncomment for a second contract:
-            <Contract
-              name="SecondContract"
-              signer={userProvider.getSigner()}
-              provider={localProvider}
-              address={address}
-              blockExplorer={blockExplorer}
-            />
-            */ }
-
-            { /* Uncomment to display and interact with an external contract (DAI on mainnet):
-            <Contract
-              name="DAI"
-              customContract={mainnetDAIContract}
-              signer={userProvider.getSigner()}
-              provider={mainnetProvider}
-              address={address}
-              blockExplorer={blockExplorer}
-            />
-            */ }
           </Route>
+
           <Route path="/contracts">
             <Contract
               name="Staker"
@@ -348,6 +331,7 @@ function App(props) {
               address={address}
               blockExplorer={blockExplorer}
             />
+
             <Contract
               name="ExampleExternalContract"
               signer={userProvider.getSigner()}
@@ -377,7 +361,7 @@ function App(props) {
       </div>
 
       <div style={{marginTop:32,opacity:0.5}}>Created by <Address
-        value={"Your...address"}
+        value={"0x7030f4D0dC092449E4868c8DDc9bc00a14C9f561"}
         ensProvider={mainnetProvider}
         fontSize={16}
       /></div>
@@ -400,8 +384,7 @@ function App(props) {
                  window.open("https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA");
                }}
                size="large"
-               shape="round"
-             >
+               shape="round" >
                <span style={{ marginRight: 8 }} role="img" aria-label="support">
                  💬
                </span>

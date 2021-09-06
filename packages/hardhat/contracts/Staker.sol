@@ -17,7 +17,7 @@ contract Staker {
   ExampleExternalContract public exampleExternalContract;
 
   // Deadline date.
-  uint256 public deadline = now + 30 seconds;
+  uint256 public deadline = now + 4 minutes;
 
 
 

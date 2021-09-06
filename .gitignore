@@ -25,6 +25,7 @@ coverage
 build
 ./packages/hardhat/mnemonic.txt
 ./packages/hardhat/0x7030f4D0dC092449E4868c8DDc9bc00a14C9f561.txt
+./packages/hardhat/ACC1.txt
 
 # misc
 .DS_Store
@@ -33,7 +34,7 @@ build
 
 # debug
 npm-debug.log*
-yarn-debug.log* 
+yarn-debug.log*
 yarn-error.log*
 
 .idea
