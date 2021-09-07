@@ -2,7 +2,7 @@
 
 This Branch has some extra features that are not mentioned in the original challenge, allowing the deployer to withdraw all eth, create new staking periods, change the deadline and also the treshold.
 
-App available at: <a href="dstake.surge.sh" target="_blank">dstake.surge.sh<a>
+App available at: <a href="https://dstake.surge.sh" target="_blank">dstake.surge.sh<a>
 
 ## 🚩 Challenge 1: Decentralized Staking App
 
