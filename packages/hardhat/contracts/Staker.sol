@@ -118,6 +118,7 @@ contract Staker is Ownable {
     uint256 balance = stakers[index].bal;
     delete stakers[index];
 
+    // Transfer balance
     (bool success, ) = _reciever.call{value: balance}("");
     require(success, "DSA: CRITICAL! Withdrawal transfer failed.");
 
@@ -150,12 +151,19 @@ contract Staker is Ownable {
 
     // Check if the threshold is 0 or negative.
     require(_threshold > 0, "DSA: threshold must be atleast 1.");
-
+    
+    // Clears mapping.
     clear();
+    
+    // Sets complete state 
     completed = false;
+    
+    // Sets a new deadline in minutes.
     deadline = block.timestamp + ( _stakingPeriod * 1 minutes );
 
+    // Sets a new threshold.
     setThreshold(_threshold);
+    
     emit newStakingPeriod(deadline);
 
   }
