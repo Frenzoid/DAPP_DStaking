@@ -283,7 +283,9 @@ function App(props) {
 
                 </div>
                 {web3Modal.cachedProvider ? "" :
-                  <p className="mt-4 mb-0 text-warning">You must Connect before doing anything!</p>
+                  <div className="mt-3 text-warning">
+                    You must <span className="text-white">connect</span> before doing any operation.
+                   </div>
                 }
               </div>
             </div>
@@ -376,7 +378,7 @@ function App(props) {
            logoutOfWeb3Modal={logoutOfWeb3Modal}
            blockExplorer={blockExplorer}
          />
-         {faucetHint}
+         {/*faucetHint*/}
       </div>
 
       <div style={{paddingTop:40}}>Created by <a href="https://frenzoid.dev" target="_blank">MrFrenzoid</a>
