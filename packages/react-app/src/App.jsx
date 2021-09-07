@@ -264,19 +264,19 @@ function App(props) {
                 <div className="d-flex flex-row justify-content-center flex-wrap">
 
                   <div style={{paddingRight:8}}>
-                    <Button className="button btn-warning" disabled={web3Modal.cachedProvider ? false : true} type={"default"} onClick={()=>{
+                    <Button className="button btn-warning" disabled={!web3Modal.cachedProvider  || complete || timeLeft == 0 ? true : false} type={"default"} onClick={()=>{
                       tx( writeContracts.Staker.execute() )
                     }}>📡 Execute!</Button>
                   </div>
 
                   <div style={{paddingRight:8}}>
-                    <Button className="button btn-primary" disabled={web3Modal.cachedProvider ? false : true} onClick={()=>{
+                    <Button className="button btn-primary" disabled={!web3Modal.cachedProvider ? true : false} onClick={()=>{
                       tx( writeContracts.Staker.stake({value: parseEther("0.1")}) )
                     }}>🥩 Stake 0.1 ether!</Button>
                   </div>
 
                   <div>
-                    <Button type={"default"} className="button btn-danger" disabled={web3Modal.cachedProvider ? false : true} onClick={()=>{
+                    <Button  className="button btn-danger" disabled={!web3Modal.cachedProvider  || !complete || timeLeft != 0 ? true : false} onClick={()=>{
                       tx( writeContracts.Staker.withdraw( address ) )
                     }}>🏧 Withdraw</Button>
                   </div>
@@ -309,6 +309,7 @@ function App(props) {
                             value={item[0]}
                             ensProvider={mainnetProvider}
                             fontSize={16}
+                            size={"short"}
                           /> 
                           <Balance
                             balance={item[1]}
@@ -330,6 +331,7 @@ function App(props) {
                             value={item[0]}
                             ensProvider={mainnetProvider}
                             fontSize={16}
+                            size={"short"}
                           /> 
                           <Balance
                             balance={item[1]}
