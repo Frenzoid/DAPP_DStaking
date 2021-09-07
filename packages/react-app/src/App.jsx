@@ -233,7 +233,7 @@ function App(props) {
           {completeDisplay}
 
             <div className="d-flex flex-row flex-wrap justify-content-around mb-5">
-              <div className="pol">
+              <div className="pol mb-1">
                 <div style={{padding:8,marginTop:32}}>
                   <div>Time Left:</div>
                   {timeLeft && humanizeDuration(timeLeft.toNumber()*1000)}
@@ -249,40 +249,42 @@ function App(props) {
                     fontSize={64}
                   />
                 </div>
-                
+
                 <div>
                   <ProgressBar  now={stakerContractBalance ? stakerContractBalance / threshold : 0} max="1" />
                 </div>
               </div>
-              
+
               <div className="pol">
                 <div style={{padding:8}}>
                   <div>You staked:</div>
                   <Balance balance={balanceStaked} fontSize={64} />
                 </div>
-        
-        
+
                 <div className="d-flex flex-row justify-content-center flex-wrap">
 
                   <div style={{paddingRight:8}}>
-                    <Button className="button btn-warning" type={"default"} onClick={()=>{
+                    <Button className="button btn-warning" disabled={web3Modal.cachedProvider ? false : true} type={"default"} onClick={()=>{
                       tx( writeContracts.Staker.execute() )
                     }}>📡 Execute!</Button>
                   </div>
 
                   <div style={{paddingRight:8}}>
-                    <Button className="button btn-primary" onClick={()=>{
+                    <Button className="button btn-primary" disabled={web3Modal.cachedProvider ? false : true} onClick={()=>{
                       tx( writeContracts.Staker.stake({value: parseEther("0.1")}) )
                     }}>🥩 Stake 0.1 ether!</Button>
                   </div>
 
                   <div>
-                    <Button type={"default"} className="button btn-danger" onClick={()=>{
+                    <Button type={"default"} className="button btn-danger" disabled={web3Modal.cachedProvider ? false : true} onClick={()=>{
                       tx( writeContracts.Staker.withdraw( address ) )
                     }}>🏧 Withdraw</Button>
                   </div>
 
                 </div>
+                {web3Modal.cachedProvider ? "" :
+                  <p className="mt-4 mb-0 text-warning">You must Connect before doing anything!</p>
+                }
               </div>
             </div>
  
