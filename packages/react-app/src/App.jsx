@@ -240,7 +240,7 @@ function App(props) {
                 </div>
 
                 <div style={{padding:8}}>
-                  <div>Total staked in Stacker Contract:</div>
+                  <div>Total staked in Staker Contract:</div>
                   <Balance
                     balance={stakerContractBalance}
                     fontSize={64}
@@ -378,7 +378,7 @@ function App(props) {
       </div>
 
       <div style={{paddingTop:40}}>Created by <a href="https://frenzoid.dev" target="_blank">MrFrenzoid</a>
-          <p>Feel free to donate any KETH you have for spare, it will help learn more about how to craft cool things like this :) </p>
+          <p>Feel free to donate any KETH you have for spare, it will help me learn more about how to craft cool things like this :) </p>
           <span style={{color:"magenta"}}>0x7030f4D0dC092449E4868c8DDc9bc00a14C9f561</span>
           <span> or </span>
           <span style={{color:"cyan"}}> 0x03B4695062564D30F34bD9586fbC3262d1C30565</span>

@@ -7,7 +7,7 @@ export default function Header() {
         DStaking!
         </h4>
           <span style={{color: "white" }}>
-            Staking in the blockchain :D - Made with <a href="https://github.com/austintgriffith/scaffold-eth" target="_blank">🏗 scaffold-eth</a>
+            Staking in the blockchain :D - Made with <a href="https://github.com/austintgriffith/scaffold-eth" target="_blank">🏗 scaffold-eth</a>.
           </span>
       </div>
   );
