@@ -11,8 +11,8 @@ const main = async () => {
 
   // const exampleExternalContract = await deploy("ExampleExternalContract")
 
-  const stakerContract = await deploy("Staker") // <-- add in constructor args like line 16 vvvv
-
+  const exampleExternalContract = await deploy("ExampleExternalContract")
+  const stakerContract = await deploy("Staker",[ exampleExternalContract.address ]) // <-- add in constructor args like line 16 vvvv
 
   //const secondContract = await deploy("SecondContract")
 

@@ -1,6 +1,12 @@
 [
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "address payable",
+        "name": "exampleExternalContractAddress",
+        "type": "address"
+      }
+    ],
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
@@ -107,21 +113,12 @@
     "type": "event"
   },
   {
-    "inputs": [],
-    "name": "adminForceClear",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    "stateMutability": "payable",
+    "type": "fallback"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_to",
-        "type": "address"
-      }
-    ],
-    "name": "adminForceWithdrawAll",
+    "inputs": [],
+    "name": "adminForceClear",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -147,6 +144,19 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "exampleExternalContract",
+    "outputs": [
+      {
+        "internalType": "contract ExampleExternalContract",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -324,5 +334,9 @@
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
+  },
+  {
+    "stateMutability": "payable",
+    "type": "receive"
   }
 ]

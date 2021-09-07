@@ -3,10 +3,13 @@ import { PageHeader } from "antd";
 
 export default function Header() {
   return (
-      <PageHeader
-        title="💰 DStaking!"
-        subTitle="Staking in the blockchain :D - Made with 🏗 scaffold-eth"
-        style={{ cursor: "pointer" }}
-      />
+      <div style={{color: "white", textAlign: "left", marginTop:10 }}>
+        <h4 style={{color: "white" }}>💰 
+        DStaking!
+        </h4>
+          <span style={{color: "white" }}>
+            Staking in the blockchain :D - Made with <a href="https://github.com/austintgriffith/scaffold-eth" target="_blank">🏗 scaffold-eth</a>
+          </span>
+      </div>
   );
 }

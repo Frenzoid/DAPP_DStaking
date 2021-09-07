@@ -35,20 +35,21 @@ const humanizeDuration = require("humanize-duration");
 */
 
 /// 📡 What chain are your contracts deployed to?
-const targetNetwork = NETWORKS['localhost']; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
+const targetNetwork = NETWORKS['kovan']; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 
 // 😬 Sorry for all the console logging
-const DEBUG = false
+const DEBUG = false;
 
 // 🛰 providers
-if(DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
+if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
 // const mainnetProvider = getDefaultProvider("mainnet", { infura: INFURA_ID, etherscan: ETHERSCAN_KEY, quorum: 1 });
 // const mainnetProvider = new InfuraProvider("mainnet",INFURA_ID);
 const mainnetProvider = new JsonRpcProvider("https://mainnet.infura.io/v3/" + INFURA_ID)
-// ( ⚠️ Getting "failed to meet quorum" errors? Check your INFURA_ID)
 
+// ( ⚠️ Getting "failed to meet quorum" errors? Check your INFURA_ID)
 // 🏠 Your local provider is usually pointed at your local blockchain
 const localProviderUrl = targetNetwork.rpcUrl;
+
 // as you deploy to other networks you can set REACT_APP_PROVIDER=https://dai.poa.network in packages/react-app/.env
 const localProviderUrlFromEnv = process.env.REACT_APP_PROVIDER ? process.env.REACT_APP_PROVIDER : localProviderUrl;
 if(DEBUG) console.log("🏠 Connecting to provider:", localProviderUrlFromEnv);
@@ -104,23 +105,27 @@ function App(props) {
   // EXTERNAL CONTRACT EXAMPLE:
   //
   // If you want to bring in the mainnet DAI contract it would look like:
-  //const mainnetDAIContract = useExternalContractLoader(mainnetProvider, DAI_ADDRESS, DAI_ABI)
-  //console.log("🥇DAI contract on mainnet:",mainnetDAIContract)
+  // const mainnetDAIContract = useExternalContractLoader(mainnetProvider, DAI_ADDRESS, DAI_ABI)
+  // console.log("🥇DAI contract on mainnet:",mainnetDAIContract)
   //
   // Then read your DAI balance like:
-  //const myMainnetBalance = useContractReader({DAI: mainnetDAIContract},"DAI", "balanceOf",["0x34aA3F359A9D614239015126635CE7732c18fDF3"])
+  // const myMainnetBalance = useContractReader({DAI: mainnetDAIContract},"DAI", "balanceOf",["0x34aA3F359A9D614239015126635CE7732c18fDF3"])
   //
 
-  //keep track of contract balance to know how much has been staked total:
+  // keep track of contract balance to know how much has been staked total:
   
   const stakerContractBalance = useBalance(localProvider, readContracts && readContracts.Staker.address);
   if(DEBUG) console.log("💵 stakerContractBalance", stakerContractBalance )
 
-  //keep track of total 'threshold' needed of ETH
+  // keep track of total 'threshold' needed of ETH
   const threshold = useContractReader(readContracts,"Staker", "threshold" )
   console.log("💵 threshold:",threshold)
 
-  //📟 Listen for broadcast events
+  // keep track of a variable from the contract in the local React state: COMPUTO
+  const balanceStaked = useContractReader(readContracts, "Staker", "stakedBalance", [ address ])
+  console.log("💸 balanceStaked:",balanceStaked)
+
+  // 📟 Listen for broadcast events
   const stakeEvents = useEventListener(readContracts, "Staker", "Stake", localProvider, 1);
   console.log("📟 stake events:",stakeEvents)
 
@@ -131,21 +136,30 @@ function App(props) {
   const complete = useContractReader(readContracts,"Staker", "completed")
   console.log("✅ complete:",complete)
 
+  const exampleExternalContractBalance = useBalance(localProvider, readContracts && readContracts.ExampleExternalContract.address);
+  if(DEBUG) console.log("💵 exampleExternalContractBalance", exampleExternalContractBalance )
+
 
   let completeDisplay = ""
   if(complete){
     completeDisplay = (
-      <div style={{padding:64, backgroundColor:"#eeffef", fontWeight:"bolder"}}>
-        🚀 🎖 👩‍🚀  - Deadline or Treshold met! Time to gamble! - 🎉  🍾   🎊
+      <div style={{padding:30, color: "white", backgroundColor:"#0d6efd", fontWeight:"bolder"}}>
+        🚀 🎖 👩‍🚀  -  ¡Ethereum Staked!  -  🎉 🍾 🎊
+        <br />
+        <Balance
+          balance={exampleExternalContractBalance}
+          fontSize={64}
+        />
+        <br />
+        ETH staked!
       </div>
     )
   }
 
 
-
   /*
   const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
-  console.log("🏷 Resolved austingriffith.eth as:",addressFromENS)
+  console.log("🏷 Resolved austingriffith.eth as:",addressFromENS);
   */
   let networkDisplay = ""
   if(localChainId && selectedChainId && localChainId != selectedChainId ){
@@ -163,9 +177,9 @@ function App(props) {
         />
       </div>
     )
-  }else{
+  } else {
     networkDisplay = (
-      <div style={{zIndex:2, position:'absolute', right:154,top:28,padding:16,color:targetNetwork.color}}>
+      <div style={{zIndex:2, position:'absolute', right:110,top:10,padding:14,color:targetNetwork.color}}>
         {targetNetwork.name}
       </div>
     )
@@ -204,80 +218,83 @@ function App(props) {
       </div>
     )
   }
-
-
-
-
+  
   return (
-    <div className="App">
+    <div className="App container">
 
       <Header />
       {networkDisplay}
       <BrowserRouter>
-
-        <Menu style={{ textAlign:"center" }} selectedKeys={[route]} mode="horizontal">
-          <Menu.Item key="/">
-            <Link onClick={()=>{setRoute("/")}} to="/">Staker UI</Link>
-          </Menu.Item>
-          <Menu.Item key="/contracts">
-            <Link onClick={()=>{setRoute("/contracts")}} to="/contracts">Debug Contracts</Link>
-          </Menu.Item>
-        </Menu>
 
         <Switch>
           <Route exact path="/">
 
           {completeDisplay}
 
-          <div style={{padding:8,marginTop:32}}>
-            
-            <div>Timeleft:</div>
-            {timeLeft && humanizeDuration(timeLeft.toNumber()*1000)}
-          </div>
+            <div className="d-flex flex-row flex-wrap justify-content-around">
+              <div className="pol">
+                <div style={{padding:8,marginTop:32}}>
+                  <div>Timeleft:</div>
+                  {timeLeft && humanizeDuration(timeLeft.toNumber()*1000)}
+                </div>
 
-          <div style={{padding:8}}>
-            <div>Total staked:</div>
-            <Balance
-              balance={stakerContractBalance}
-              fontSize={64}
-            />/<Balance
-              balance={threshold}
-              fontSize={64}
-            />
-          </div>
-  
-          <div className="d-flex flex-row justify-content-center flex-wrap">
+                <div style={{padding:8}}>
+                  <div>Total staked:</div>
+                  <Balance
+                    balance={stakerContractBalance}
+                    fontSize={64}
+                  />/<Balance
+                    balance={threshold}
+                    fontSize={64}
+                  />
+                </div>
+                
+                <div>
+                  <progress value={stakerContractBalance / threshold * 100} max="100"> </progress>
+                </div>
+              </div>
+              
+              <div className="pol">
+                <div style={{padding:8}}>
+                  <div>You staked:</div>
+                  <Balance balance={balanceStaked} fontSize={64} />
+                </div>
+        
+        
+                <div className="d-flex flex-row justify-content-center flex-wrap">
 
-            <div style={{padding:8}}>
-              <Button type={"default"} onClick={()=>{
-                tx( writeContracts.Staker.execute() )
-              }}>📡  Execute!</Button>
+                  <div style={{padding:8}}>
+                    <Button className="button btn-warning" type={"default"} onClick={()=>{
+                      tx( writeContracts.Staker.execute() )
+                    }}>📡 Execute!</Button>
+                  </div>
+
+                  <div style={{padding:8}}>
+                    <Button className="button btn-primary" onClick={()=>{
+                      tx( writeContracts.Staker.stake({value: parseEther("0.1")}) )
+                    }}>🥩 Stake 0.1 ether!</Button>
+                  </div>
+
+                  <div style={{padding:8}} >
+                    <Button type={"default"} className="button btn-danger" onClick={()=>{
+                      tx( writeContracts.Staker.withdraw( address ) )
+                    }}>🏧 Withdraw</Button>
+                  </div>
+
+                </div>
+              </div>
             </div>
-
-            <div style={{padding:8}}>
-              <Button onClick={()=>{
-                tx( writeContracts.Staker.stake({value: parseEther("0.5")}) )
-              }}>🥩  Stake 0.5 ether!</Button>
-            </div>
-
-            <div style={{padding:8}}>
-              <Button type={"default"} onClick={()=>{
-                tx( writeContracts.Staker.withdraw( address ) )
-              }}>🏧  Withdraw</Button>
-            </div>
-
-          </div>
-
-
+ 
             {/*
                 🎛 this scaffolding is full of commonly used components
                 this <Contract/> component will automatically parse your ABI
                 and give you a form to interact with it locally
             */}
+            <hr />
 
-            <div style={{width:500, margin:"auto",marginTop:64}}>
+            <div style={{maxWidth:500, margin:"auto", marginTop:64}}>
               <div>Stake Events:</div>
-              <List
+              <List className="color-white"
                 dataSource={stakeEvents}
                 renderItem={(item) => {
                   return (
@@ -289,15 +306,12 @@ function App(props) {
                         /> 
                         <Balance
                           balance={item[1]}
-
                         />
-
                     </List.Item>
                   )
                 }}
               />
             </div>
-
 
           </Route>
 
@@ -309,13 +323,22 @@ function App(props) {
               address={address}
               blockExplorer={blockExplorer}
             />
+
+            <Contract
+              name="ExampleExternalContract"
+              signer={userProvider.getSigner()}
+              provider={localProvider}
+              address={address}
+              blockExplorer={blockExplorer}
+            />
+
           </Route>
+          
         </Switch>
       </BrowserRouter>
 
-
       {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
-      <div style={{ position: "fixed", textAlign: "right", right: 0, top: 0, padding: 10 }}>
+      <div style={{ position: "fixed", textAlign: "right", right: 0, top: 0, padding: 10 }} >
          <Account
            address={address}
            localProvider={localProvider}
@@ -330,15 +353,13 @@ function App(props) {
          {faucetHint}
       </div>
 
-      <div style={{marginTop:32,opacity:0.5}}>Created by <Address
-        value={"0x7030f4D0dC092449E4868c8DDc9bc00a14C9f561"}
-        ensProvider={mainnetProvider}
-        fontSize={16}
-      /></div>
+      <div style={{marginTop:32, opacity:0.7}}>Created by <a href="https://frenzoid.dev" target="_blank">MrFrenzoid</a>
+      
+      </div>
 
-      <div style={{marginTop:32,opacity:0.5}}><a target="_blank" style={{padding:32,color:"#000"}} href="https://github.com/austintgriffith/scaffold-eth">🍴 Fork me!</a></div>
+      { /*<div style={{marginTop:32,opacity:0.5}}><a target="_blank" style={{padding:32,color:"#000"}} href="https://github.com/austintgriffith/scaffold-eth">🍴 Fork me!</a></div> */}
 
-      {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
+      {/* 🗺 Extra UI like gas price, eth price, faucet, and support: }
        <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
          <Row align="middle" gutter={[4, 4]}>
            <Col span={8}>
@@ -362,12 +383,12 @@ function App(props) {
              </Button>
            </Col>
          </Row>
-
+        
          <Row align="middle" gutter={[4, 4]}>
            <Col span={24}>
              {
 
-               /*  if the local provider has a signer, let's show the faucet:  */
+               //  if the local provider has a signer, let's show the faucet:
                localProvider && localProvider.connection && localProvider.connection.url && localProvider.connection.url.indexOf(window.location.hostname)>=0 && !process.env.REACT_APP_PROVIDER && price > 1 ? (
                  <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider}/>
                ) : (
@@ -376,7 +397,7 @@ function App(props) {
              }
            </Col>
          </Row>
-       </div>
+       </div>*/}
 
     </div>
   );
