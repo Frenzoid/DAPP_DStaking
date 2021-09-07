@@ -1,9 +1,8 @@
 import React from "react";
-import { PageHeader } from "antd";
 
 export default function Header() {
   return (
-      <div style={{color: "white", textAlign: "left", marginTop:10 }}>
+      <div style={{color: "white", textAlign: "left", paddingTop: 10 }}>
         <h4 style={{color: "white" }}>💰 
         DStaking!
         </h4>

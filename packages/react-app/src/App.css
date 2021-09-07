@@ -1,3 +1,4 @@
+/* GENERAL TAGS*/
 body {
   background-color: #0d1117;
   color: #c2c4c3;
@@ -11,6 +12,8 @@ a {
   text-decoration: none;
 }
 
+
+/* CLASSES */
 .pol {
   width: 500px;
   margin-top: auto;
@@ -20,3 +23,31 @@ a {
   text-align: center;
 }
 
+/* IDS */
+#list{
+  height: 390px; 
+  overflow: hidden; 
+  overflow-y: scroll;
+}
+
+
+/* SCROLL BAR*/
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #0d1117;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #002a66;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #004cb8;
+}

@@ -9,16 +9,16 @@ contract Staker is Ownable {
 
   // - Attributes.
   // User struct.
-  struct Gambler {
+  struct User {
     address addr;
     uint256 bal;
   }
 
   // Array of balances of users (because we will want to iterate over them).
-  mapping(uint256 => Gambler) public gamblers;
+  mapping(uint256 => User) public stakers;
 
   // stakers count.
-  uint256 public gamblerCount;
+  uint256 public stakersCount;
 
   // Threshold.
   uint256 public threshold;
@@ -26,8 +26,11 @@ contract Staker is Ownable {
   // Deadline date.
   uint256 public deadline;
 
-  // completed
+  // Completed
   bool public completed;
+
+  // Latest winner.
+  address public winner;
 
   // External Contract.
   ExampleExternalContract public exampleExternalContract;
@@ -39,7 +42,7 @@ contract Staker is Ownable {
   event Withdraw(address sender, address reciever, uint256 amount);
   event Completed(uint256 staked);
   event newStakingPeriod(uint256 deadline);
-  event newTreshold(uint256 treshold);
+  event newThreshold(uint256 threshold);
 
 
 
@@ -61,10 +64,11 @@ contract Staker is Ownable {
   // - Constructor
   constructor(address payable exampleExternalContractAddress) public {
     exampleExternalContract = ExampleExternalContract(exampleExternalContractAddress);
-    gamblerCount = 0;
+    stakersCount = 0;
     threshold = 1 ether;
-    deadline = block.timestamp + 15 minutes;
     completed = false;
+    deadline = block.timestamp + 15 minutes;
+    winner = address(0);
   }
 
 
@@ -76,10 +80,10 @@ contract Staker is Ownable {
     (uint256 index, bool found) = findUserIndex(msg.sender);
 
     if (found) {
-      gamblers[index].bal += msg.value;
+      stakers[index].bal += msg.value;
     } else {
-      gamblerCount++;
-      gamblers[gamblerCount] = Gambler(msg.sender, msg.value);
+      stakersCount++;
+      stakers[stakersCount] = User(msg.sender, msg.value);
     }
 
     emit Stake(msg.sender, msg.value);
@@ -90,21 +94,19 @@ contract Staker is Ownable {
 
   }
 
-  // Execute function, will triger after deadline and treshold. For now it sends all eth to me :), for now..
+  // Execute function, will triger after deadline and threshold. For now it sends all eth to me :), for now..
   function execute() public notCompleted deadlineNotPassed{
 
-    require(address(this).balance >= threshold, "DSA: Can't execute yet, treshold hasn't been met.");
+    require(address(this).balance >= threshold, "DSA: Can't execute yet, threshold hasn't been met.");
 
     completed = true;
+    
     emit Completed(address(this).balance);
 
     exampleExternalContract.complete{value: address(this).balance}();
-
-    clear();
-
   }
 
-  // Makes users able to withdraw if deadline is met, but treshold isn't.
+  // Makes users able to withdraw if deadline is met, but threshold isn't.
   function withdraw(address payable _reciever) public notCompleted {
     
     // Check if address is empty, if it is, withraw to its account.
@@ -117,8 +119,8 @@ contract Staker is Ownable {
     (uint256 index, bool found) = findUserIndex(msg.sender);
     require(found, "DSA: You dont have funds staked to withdraw.");
 
-    uint256 balance = gamblers[index].bal;
-    delete gamblers[index];
+    uint256 balance = stakers[index].bal;
+    delete stakers[index];
 
     (bool success, ) = _reciever.call{value: balance}("");
     require(success, "DSA: CRITICAL! Withdrawal transfer failed.");
@@ -139,37 +141,38 @@ contract Staker is Ownable {
 
     (uint256 index, bool found) = findUserIndex(_user);
     if(!found) return 0;
-    return gamblers[index].bal;
+    return stakers[index].bal;
 
   }
 
 
 
   // - Admin methods.
-  // Restarts the staking period, with a new time and treshold.
-  function newStakingPeriodMinutes(uint256 _stakingPeriod, uint256 _treshold) public onlyOwner {
+  // Restarts the staking period, with a new time and threshold.
+  function newStakingPeriodMinutes(uint256 _stakingPeriod, uint256 _threshold) public onlyOwner {
 
     // Check if the period is 0 or negative.
     require(_stakingPeriod > 0, "DSA: Minutes can't be 0 or negative.");
 
-    // Check if the treshold is 0 or negative.
-    require(_treshold > 0, "DSA: treshold must be atleast 1.");
+    // Check if the threshold is 0 or negative.
+    require(_threshold > 0, "DSA: threshold must be atleast 1.");
 
+    clear();
     completed = false;
     deadline = block.timestamp + ( _stakingPeriod * 1 minutes );
 
-    setTreshold(_treshold);
+    setThreshold(_threshold);
 
     emit newStakingPeriod(deadline);
 
   }
 
-  // Sets a treshold.
-  function setTreshold(uint256 _eth) public onlyOwner {
+  // Sets a threshold.
+  function setThreshold(uint256 _eth) public onlyOwner {
 
     threshold = _eth * 1 ether;
 
-    emit newTreshold(threshold);
+    emit newThreshold(threshold);
 
   }
 
@@ -178,17 +181,27 @@ contract Staker is Ownable {
     clear();
   }
 
+  // Emergency function to withdraw all money.
+  function adminWithdrawAll(address _to) public onlyOwner {
+
+    require(_to != address(0), "DSA: Invalid address.");
+    
+    (bool success, ) = _to.call{value: address(this).balance}("");
+    require(success, "DSA: CRITICAL! adminWithdrawAll transfer failed.");
+
+  }
+
 
 
   // - Internal methods.
   // Clears the mappings.
   function clear() internal {
 
-    for(uint256 i = gamblerCount; i > 0; i--) {
-      delete gamblers[i];
+    for(uint256 i = stakersCount; i > 0; i--) {
+      delete stakers[i];
     }
 
-    gamblerCount = 0;
+    stakersCount = 0;
 
   }
 
@@ -199,11 +212,11 @@ contract Staker is Ownable {
     require(_addr != address(0), "DSA: Invalid Address.");
 
     // If there are no accounts, return false.
-    if(gamblerCount == 0) return (0, false);
+    if(stakersCount == 0) return (0, false);
 
     // Reverse loops are faster :)
-    for(uint256 i = gamblerCount; i > 0; i--){
-      if(gamblers[i].addr == _addr) {
+    for(uint256 i = stakersCount; i > 0; i--){
+      if(stakers[i].addr == _addr) {
           return (i, true);
       }
     }
@@ -211,6 +224,8 @@ contract Staker is Ownable {
     return (0, false);
 
   }
+
+
 
   // - Fallback & receive
   fallback() external payable { revert(); }

@@ -105,11 +105,11 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "treshold",
+        "name": "threshold",
         "type": "uint256"
       }
     ],
-    "name": "newTreshold",
+    "name": "newThreshold",
     "type": "event"
   },
   {
@@ -119,6 +119,19 @@
   {
     "inputs": [],
     "name": "adminForceClear",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_to",
+        "type": "address"
+      }
+    ],
+    "name": "adminWithdrawAll",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -170,43 +183,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "gamblerCount",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "gamblers",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "addr",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "bal",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -215,7 +191,7 @@
       },
       {
         "internalType": "uint256",
-        "name": "_treshold",
+        "name": "_threshold",
         "type": "uint256"
       }
     ],
@@ -252,7 +228,7 @@
         "type": "uint256"
       }
     ],
-    "name": "setTreshold",
+    "name": "setThreshold",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -273,6 +249,43 @@
       }
     ],
     "name": "stakedBalance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "stakers",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "addr",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "bal",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "stakersCount",
     "outputs": [
       {
         "internalType": "uint256",
@@ -320,6 +333,19 @@
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "winner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

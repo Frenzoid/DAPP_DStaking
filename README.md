@@ -1,5 +1,11 @@
 # 🏗 scaffold-eth | 🏰 BuidlGuidl
 
+This Branch has some extra features that are not mentioned in the original challenge, allowing
+the deployer to withdraw all eth, create new staking periods, change the deadline and also
+the treshold.
+
+Also, when execute gets called, a random user is picked, and all stakes are sent to them.
+
 ## 🚩 Challenge 1: Decentralized Staking App
 
 > 🏦 Build a `Staker.sol` contract that collects **ETH** from numerous addresses using a payable `stake()` function and keeps track of `balances`. After some `deadline` if it has at least some `threshold` of ETH, it sends it to an `ExampleExternalContract` and triggers the `complete()` action sending the full balance. If not enough **ETH** is collected, allow users to `withdraw()`.

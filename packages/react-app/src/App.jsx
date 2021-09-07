@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
 import "antd/dist/antd.css";
-import "bootstrap/dist/css/bootstrap.css"
+import "bootstrap/dist/css/bootstrap.css";
+import ProgressBar from 'react-bootstrap/ProgressBar';
 import {  JsonRpcProvider, Web3Provider } from "@ethersproject/providers";
 import "./App.css";
 import { Row, Col, Button, Menu, Alert, List } from "antd";
@@ -114,45 +115,45 @@ function App(props) {
 
   // keep track of contract balance to know how much has been staked total:
   
+
+  const threshold = useContractReader(readContracts,"Staker", "threshold" )
+
+  const balanceStaked = useContractReader(readContracts, "Staker", "stakedBalance", [ address ])
+
+  const stakeEvents = useEventListener(readContracts, "Staker", "Stake", localProvider, 1);
+  const withdrawEvents = useEventListener(readContracts, "ExampleExternalContract", "stakeWithdrawed", localProvider, 2);
+
+  const timeLeft = useContractReader(readContracts,"Staker", "timeLeft")
+
+  const complete = useContractReader(readContracts,"Staker", "completed")
+
+  const lastWinner = useContractReader(readContracts,"Staker", "winner")
+
   const stakerContractBalance = useBalance(localProvider, readContracts && readContracts.Staker.address);
   if(DEBUG) console.log("💵 stakerContractBalance", stakerContractBalance )
 
-  // keep track of total 'threshold' needed of ETH
-  const threshold = useContractReader(readContracts,"Staker", "threshold" )
-  console.log("💵 threshold:",threshold)
-
-  // keep track of a variable from the contract in the local React state: COMPUTO
-  const balanceStaked = useContractReader(readContracts, "Staker", "stakedBalance", [ address ])
-  console.log("💸 balanceStaked:",balanceStaked)
-
-  // 📟 Listen for broadcast events
-  const stakeEvents = useEventListener(readContracts, "Staker", "Stake", localProvider, 1);
-  console.log("📟 stake events:",stakeEvents)
-
-  // keep track of a variable from the contract in the local React state:
-  const timeLeft = useContractReader(readContracts,"Staker", "timeLeft")
-  console.log("⏳ timeLeft:",timeLeft)
-
-  const complete = useContractReader(readContracts,"Staker", "completed")
-  console.log("✅ complete:",complete)
-
-  const exampleExternalContractBalance = useBalance(localProvider, readContracts && readContracts.ExampleExternalContract.address);
+  const exampleExternalContractBalance = useContractReader(readContracts,"ExampleExternalContract", "lastStackValue");
   if(DEBUG) console.log("💵 exampleExternalContractBalance", exampleExternalContractBalance )
 
 
   let completeDisplay = ""
   if(complete){
     completeDisplay = (
-      <div style={{padding:30, color: "white", backgroundColor:"#0d6efd", fontWeight:"bolder"}}>
-        🚀 🎖 👩‍🚀  -  ¡Ethereum Staked!  -  🎉 🍾 🎊
-        <br />
-        <Balance
-          balance={exampleExternalContractBalance}
-          fontSize={64}
-        />
-        <br />
-        ETH staked!
-      </div>
+        <div style={{paddingTop:30, color: "white", backgroundColor:"#0d6efd", fontWeight:"bolder"}}>
+          🚀 🎖 👩‍🚀  -  ¡Ethereum Staked!  -  🎉 🍾 🎊
+          <br />
+          <Balance
+            balance={exampleExternalContractBalance}
+            fontSize={64}
+          />
+          <br />
+          <div style={{padding:30, color: "white"}}>
+             ETH staked and sent to External Contract!
+          </div>
+          <div style={{padding:30, color: "white", backgroundColor:"#a83246"}}>
+            Staking period finished! No more staking.. for now!
+          </div>
+        </div>
     )
   }
 
@@ -179,9 +180,9 @@ function App(props) {
     )
   } else {
     networkDisplay = (
-      <div style={{zIndex:2, position:'absolute', right:110,top:10,padding:14,color:targetNetwork.color}}>
-        {targetNetwork.name}
-      </div>
+      <strong style={{zIndex:2, position:'absolute', right:110, top:10, padding:14, color:targetNetwork.color}}>
+        {targetNetwork.name.toUpperCase()}
+      </strong>
     )
   }
 
@@ -231,15 +232,15 @@ function App(props) {
 
           {completeDisplay}
 
-            <div className="d-flex flex-row flex-wrap justify-content-around">
+            <div className="d-flex flex-row flex-wrap justify-content-around mb-5">
               <div className="pol">
                 <div style={{padding:8,marginTop:32}}>
-                  <div>Timeleft:</div>
+                  <div>Time Left:</div>
                   {timeLeft && humanizeDuration(timeLeft.toNumber()*1000)}
                 </div>
 
                 <div style={{padding:8}}>
-                  <div>Total staked:</div>
+                  <div>Total staked in Stacker Contract:</div>
                   <Balance
                     balance={stakerContractBalance}
                     fontSize={64}
@@ -250,7 +251,7 @@ function App(props) {
                 </div>
                 
                 <div>
-                  <progress value={stakerContractBalance / threshold * 100} max="100"> </progress>
+                  <ProgressBar  now={stakerContractBalance ? stakerContractBalance / threshold : 0} max="1" />
                 </div>
               </div>
               
@@ -263,19 +264,19 @@ function App(props) {
         
                 <div className="d-flex flex-row justify-content-center flex-wrap">
 
-                  <div style={{padding:8}}>
+                  <div style={{paddingRight:8}}>
                     <Button className="button btn-warning" type={"default"} onClick={()=>{
                       tx( writeContracts.Staker.execute() )
                     }}>📡 Execute!</Button>
                   </div>
 
-                  <div style={{padding:8}}>
+                  <div style={{paddingRight:8}}>
                     <Button className="button btn-primary" onClick={()=>{
                       tx( writeContracts.Staker.stake({value: parseEther("0.1")}) )
                     }}>🥩 Stake 0.1 ether!</Button>
                   </div>
 
-                  <div style={{padding:8}} >
+                  <div>
                     <Button type={"default"} className="button btn-danger" onClick={()=>{
                       tx( writeContracts.Staker.withdraw( address ) )
                     }}>🏧 Withdraw</Button>
@@ -292,30 +293,53 @@ function App(props) {
             */}
             <hr />
 
-            <div style={{maxWidth:500, margin:"auto", marginTop:64}}>
-              <div>Stake Events:</div>
-              <List className="color-white"
-                dataSource={stakeEvents}
-                renderItem={(item) => {
-                  return (
-                    <List.Item key={item[0] + item[1] + item.blockNumber}>
-                      <Address
-                          value={item[0]}
-                          ensProvider={mainnetProvider}
-                          fontSize={16}
-                        /> 
-                        <Balance
-                          balance={item[1]}
-                        />
-                    </List.Item>
-                  )
-                }}
-              />
+            <div className="d-flex flex-row justify-content-between flex-wrap">
+              <div style={{minWidth:500, margin:"auto", marginTop:20}}>
+                <div>Stake Events:</div>
+                <List className="color-white" id="list" 
+                  dataSource={stakeEvents}
+                  renderItem={(item) => {
+                    return (
+                      <List.Item key={item[0] + item[1] + item.blockNumber}>
+                        <Address
+                            value={item[0]}
+                            ensProvider={mainnetProvider}
+                            fontSize={16}
+                          /> 
+                          <Balance
+                            balance={item[1]}
+                          />
+                      </List.Item>
+                    )
+                  }}
+                />
+              </div>
+
+              <div style={{minWidth:500, margin:"auto", marginTop:20}}>
+                <div>Withdrawal Events:</div>
+                <List style={{color: "white"}} id="list" 
+                  dataSource={withdrawEvents}
+                  renderItem={(item) => {
+                    return (
+                      <List.Item key={item[0] + item[1] + item.blockNumber}>
+                        <Address
+                            value={item[0]}
+                            ensProvider={mainnetProvider}
+                            fontSize={16}
+                          /> 
+                          <Balance
+                            balance={item[1]}
+                          />
+                      </List.Item>
+                    )
+                  }}
+                />
+              </div>
             </div>
 
           </Route>
 
-          <Route path="/contracts">
+          <Route path="/admin">
             <Contract
               name="Staker"
               signer={userProvider.getSigner()}
@@ -353,8 +377,11 @@ function App(props) {
          {faucetHint}
       </div>
 
-      <div style={{marginTop:32, opacity:0.7}}>Created by <a href="https://frenzoid.dev" target="_blank">MrFrenzoid</a>
-      
+      <div style={{paddingTop:40}}>Created by <a href="https://frenzoid.dev" target="_blank">MrFrenzoid</a>
+          <p>Feel free to donate any KETH you have for spare, it will help learn more about how to craft cool things like this :) </p>
+          <span style={{color:"magenta"}}>0x7030f4D0dC092449E4868c8DDc9bc00a14C9f561</span>
+          <span> or </span>
+          <span style={{color:"cyan"}}> 0x03B4695062564D30F34bD9586fbC3262d1C30565</span>
       </div>
 
       { /*<div style={{marginTop:32,opacity:0.5}}><a target="_blank" style={{padding:32,color:"#000"}} href="https://github.com/austintgriffith/scaffold-eth">🍴 Fork me!</a></div> */}
@@ -397,7 +424,7 @@ function App(props) {
              }
            </Col>
          </Row>
-       </div>*/}
+       </div> */}
 
     </div>
   );
