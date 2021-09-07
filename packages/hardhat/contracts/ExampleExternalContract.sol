@@ -18,7 +18,8 @@ contract ExampleExternalContract is Ownable {
   event stakeWithdrawed(address transeferedTo, uint256 stake);
 
 
-  // - Contructor.
+
+  // - Constructor.
   constructor () public { 
     lastStackValue = 0;
   }
@@ -36,6 +37,7 @@ contract ExampleExternalContract is Ownable {
   }
   
   
+  
   // - Admin methods.
   // Withdrawal function.
   function adminWithdrawAll(address _to) public onlyOwner {
@@ -48,6 +50,7 @@ contract ExampleExternalContract is Ownable {
     require(success, "DSA: CRITICAL! adminWithdrawAll transfer failed.");
 
   }
+  
   
   
   // - Fallback & receive
