@@ -14,7 +14,7 @@ contract Staker is Ownable {
     uint256 bal;
   }
 
-  // Array of balances of users (because we will want to iterate over them).
+  // mapping of balances of users (slower since we need to iterate, but gives more control and storage cleanance).
   mapping(uint256 => User) public stakers;
 
   // stakers count.
@@ -28,9 +28,6 @@ contract Staker is Ownable {
 
   // Completed
   bool public completed;
-
-  // Latest winner.
-  address public winner;
 
   // External Contract.
   ExampleExternalContract public exampleExternalContract;
@@ -68,7 +65,6 @@ contract Staker is Ownable {
     threshold = 1 ether;
     completed = false;
     deadline = block.timestamp + 15 minutes;
-    winner = address(0);
   }
 
 
@@ -94,7 +90,7 @@ contract Staker is Ownable {
 
   }
 
-  // Execute function, will triger after deadline and threshold. For now it sends all eth to me :), for now..
+  // Execute function, will triger after deadline and threshold or threshold reaching. It sends all eth to the external contract.
   function execute() public notCompleted deadlineNotPassed{
 
     require(address(this).balance >= threshold, "DSA: Can't execute yet, threshold hasn't been met.");
@@ -108,20 +104,21 @@ contract Staker is Ownable {
 
   // Makes users able to withdraw if deadline is met, but threshold isn't.
   function withdraw(address payable _reciever) public notCompleted {
+    // Check if timer is done.
+    require(timeLeft() == 0, "DSA: You cannot withdraw during the staking period. Wait until the timer is done.");
     
     // Check if address is empty, if it is, withraw to its account.
     if(address(_reciever) == address(0)) _reciever = msg.sender;
-
-    // Check if timer is done.
-    require(timeLeft() == 0, "DSA: You cannot withdraw during the staking period. Wait until the timer is done.");
     
     // Check if user has staked eth.
     (uint256 index, bool found) = findUserIndex(msg.sender);
     require(found, "DSA: You dont have funds staked to withdraw.");
 
+    // Withdraw and delete.
     uint256 balance = stakers[index].bal;
     delete stakers[index];
 
+    // Transfer balance
     (bool success, ) = _reciever.call{value: balance}("");
     require(success, "DSA: CRITICAL! Withdrawal transfer failed.");
 
@@ -131,9 +128,7 @@ contract Staker is Ownable {
 
   // Returns the time left of the deadline.
   function timeLeft() public view returns (uint256) {
-
     return (block.timestamp >= deadline) ? 0 : deadline - block.timestamp;
-
   }
 
   // Returns the staked balance of the caller.
@@ -156,13 +151,19 @@ contract Staker is Ownable {
 
     // Check if the threshold is 0 or negative.
     require(_threshold > 0, "DSA: threshold must be atleast 1.");
-
+    
+    // Clears mapping.
     clear();
+    
+    // Sets complete state 
     completed = false;
+    
+    // Sets a new deadline in minutes.
     deadline = block.timestamp + ( _stakingPeriod * 1 minutes );
 
+    // Sets a new threshold.
     setThreshold(_threshold);
-
+    
     emit newStakingPeriod(deadline);
 
   }
@@ -171,7 +172,6 @@ contract Staker is Ownable {
   function setThreshold(uint256 _eth) public onlyOwner {
 
     threshold = _eth * 1 ether;
-
     emit newThreshold(threshold);
 
   }
@@ -197,6 +197,7 @@ contract Staker is Ownable {
   // Clears the mappings.
   function clear() internal {
 
+    // Reverse loops are faster :)
     for(uint256 i = stakersCount; i > 0; i--) {
       delete stakers[i];
     }
