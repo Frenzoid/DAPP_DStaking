@@ -68,7 +68,7 @@ export default function Balance(props) {
         setDollarMode(!dollarMode);
       }}
     >
-      {displayBalance}
+      {displayBalance} KETH
     </span>
   );
 }

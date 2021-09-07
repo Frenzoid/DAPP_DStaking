@@ -129,8 +129,6 @@ function App(props) {
 
   const complete = useContractReader(readContracts,"Staker", "completed")
 
-  const lastWinner = useContractReader(readContracts,"Staker", "winner")
-
   const stakerContractBalance = useBalance(localProvider, readContracts && readContracts.Staker.address);
   if(DEBUG) console.log("💵 stakerContractBalance", stakerContractBalance )
 
@@ -291,7 +289,7 @@ function App(props) {
                 }
               </div>
             </div>
-                
+
             {/*
                 🎛 this scaffolding is full of commonly used components
                 this <Contract/> component will automatically parse your ABI
@@ -386,7 +384,7 @@ function App(props) {
       </div>
 
       <div style={{paddingTop:40}}>Created by <a href="https://frenzoid.dev" target="_blank">MrFrenzoid</a>
-          <p>Feel free to donate any KETH you have for spare, it will help me learn more about how to craft cool things like this :) </p>
+          <p>If you like what you see, feel free to donate any KETH you have for spare, it will help me learn more about how to craft cool things like this :) </p>
           <span style={{color:"magenta"}}>0x7030f4D0dC092449E4868c8DDc9bc00a14C9f561</span>
           <span> or </span>
           <span style={{color:"cyan"}}> 0x03B4695062564D30F34bD9586fbC3262d1C30565</span>
