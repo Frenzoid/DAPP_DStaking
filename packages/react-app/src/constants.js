@@ -1,6 +1,7 @@
 // MY INFURA_ID, SWAP IN YOURS FROM https://infura.io/dashboard/ethereum
 // UPDATED! Frenzoid 2021
 export const INFURA_ID = "2cf91c8e5f324f4c893e17928e0e1c19";
+export const MORALIS_ID = "9622cad71da77fb2121a65ae";
 
 // MY ETHERSCAN_ID, SWAP IN YOURS FROM https://etherscan.io/myapikey
 // UPDATED! Frenzoid 2021
@@ -42,9 +43,9 @@ export const NETWORKS = {
         name: "kovan",
         color: '#7003DD',
         chainId: 42,
-        rpcUrl: `https://kovan.infura.io/v3/${INFURA_ID}`,
+        rpcUrl: `https://speedy-nodes-nyc.moralis.io/${MORALIS_ID}/eth/kovan`, // MODIFIED FROM INFURA TO MORALIS.
         blockExplorer: "https://kovan.etherscan.io/",
-        faucet: "https://gitter.im/kovan-testnet/faucet",//https://faucet.kovan.network/
+        faucet: "https://gitter.im/kovan-testnet/faucet", //https://faucet.kovan.network/
     },
     rinkeby: {
         name: "rinkeby",

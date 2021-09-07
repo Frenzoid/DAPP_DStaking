@@ -14,7 +14,7 @@ import { Header, Account, Faucet, Ramp, Contract, GasGauge, Balance, Address } f
 import { Transactor } from "./helpers";
 import { formatEther, parseEther } from "@ethersproject/units";
 import { Hints, ExampleUI, Subgraph } from "./views"
-import { INFURA_ID, DAI_ADDRESS, DAI_ABI, NETWORK, NETWORKS } from "./constants";
+import { INFURA_ID, MORALIS_ID, DAI_ADDRESS, DAI_ABI, NETWORK, NETWORKS } from "./constants";
 const humanizeDuration = require("humanize-duration");
 /*
     Welcome to 🏗 scaffold-eth !
@@ -45,7 +45,9 @@ const DEBUG = false;
 if (DEBUG) console.log("📡 Connecting to Mainnet Ethereum");
 // const mainnetProvider = getDefaultProvider("mainnet", { infura: INFURA_ID, etherscan: ETHERSCAN_KEY, quorum: 1 });
 // const mainnetProvider = new InfuraProvider("mainnet",INFURA_ID);
-const mainnetProvider = new JsonRpcProvider("https://mainnet.infura.io/v3/" + INFURA_ID)
+// const mainnetProvider = new JsonRpcProvider("https://mainnet.infura.io/v3/" + INFURA_ID)
+const mainnetProvider = new JsonRpcProvider(`https://speedy-nodes-nyc.moralis.io/${MORALIS_ID}/eth/mainnet`)
+
 
 // ( ⚠️ Getting "failed to meet quorum" errors? Check your INFURA_ID)
 // 🏠 Your local provider is usually pointed at your local blockchain
@@ -63,7 +65,7 @@ const blockExplorer = targetNetwork.blockExplorer;
 function App(props) {
   const [injectedProvider, setInjectedProvider] = useState();
   /* 💵 This hook will get the price of ETH from 🦄 Uniswap: */
-  const price = useExchangePrice(targetNetwork,mainnetProvider);
+  const price = useExchangePrice(targetNetwork, mainnetProvider);
 
   /* 🔥 This hook will get the price of Gas from ⛽️ EtherGasStation */
   const gasPrice = useGasPrice(targetNetwork,"fast");
@@ -289,7 +291,7 @@ function App(props) {
                 }
               </div>
             </div>
- 
+                
             {/*
                 🎛 this scaffolding is full of commonly used components
                 this <Contract/> component will automatically parse your ABI
@@ -342,7 +344,7 @@ function App(props) {
                 />
               </div>
             </div>
-
+            <Link onClick={()=>{setRoute("/admin")}} to="/admin">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</Link>
           </Route>
 
           <Route path="/admin">
