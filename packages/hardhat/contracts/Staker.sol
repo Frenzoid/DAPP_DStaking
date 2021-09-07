@@ -14,7 +14,7 @@ contract Staker is Ownable {
     uint256 bal;
   }
 
-  // Array of balances of users (because we will want to iterate over them).
+  // mapping of balances of users (slower since we need to iterate, but gives more control and storage clearance).
   mapping(uint256 => User) public stakers;
 
   // stakers count.
