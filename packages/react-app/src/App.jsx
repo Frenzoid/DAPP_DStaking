@@ -33,8 +33,11 @@ const blockExplorer = targetNetwork.blockExplorer;
 
 function App(props) {
 
-  // External compound
+  // State vars
   const [injectedProvider, setInjectedProvider] = useState();
+  
+  
+  // External compound
   const price = useExchangePrice(targetNetwork, mainnetProvider);
   const gasPrice = useGasPrice(targetNetwork, "fast");
   const userProvider = useUserProvider(injectedProvider, localProvider);
