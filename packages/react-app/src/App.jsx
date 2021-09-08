@@ -1,3 +1,4 @@
+// Imports.
 import React, { useCallback, useEffect, useState } from "react";
 import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
 import ProgressBar from 'react-bootstrap/ProgressBar';
@@ -13,12 +14,15 @@ import { formatEther, parseEther } from "@ethersproject/units";
 import { Hints, ExampleUI, Subgraph } from "./views"
 import { INFURA_ID, MORALIS_ID, DAI_ADDRESS, DAI_ABI, NETWORK, NETWORKS } from "./constants";
 
+// CSS.
 import "antd/dist/antd.css";
 import "bootstrap/dist/css/bootstrap.css";
 import "./App.css";
 
+// Custom.
 const humanizeDuration = require("humanize-duration");
 
+// Connection.
 const targetNetwork = NETWORKS['kovan']; // <------- select your target frontend network (localhost, rinkeby, xdai, mainnet)
 const mainnetProvider = new JsonRpcProvider(`https://speedy-nodes-nyc.moralis.io/${MORALIS_ID}/eth/mainnet`)
 const localProviderUrl = targetNetwork.rpcUrl;
@@ -29,31 +33,37 @@ const blockExplorer = targetNetwork.blockExplorer;
 
 function App(props) {
 
+  // External compound
   const [injectedProvider, setInjectedProvider] = useState();
   const price = useExchangePrice(targetNetwork, mainnetProvider);
   const gasPrice = useGasPrice(targetNetwork, "fast");
   const userProvider = useUserProvider(injectedProvider, localProvider);
   const address = useUserAddress(userProvider);
-  let localChainId = localProvider && localProvider._network && localProvider._network.chainId
-  let selectedChainId = userProvider && userProvider._network && userProvider._network.chainId
-  const tx = Transactor(userProvider, gasPrice)
-  const faucetTx = Transactor(localProvider, gasPrice)
-  const yourLocalBalance = useBalance(localProvider, address);
-  const yourMainnetBalance = useBalance(mainnetProvider, address);
-  const readContracts = useContractLoader(localProvider)
-  const writeContracts = useContractLoader(userProvider)
 
 
-  const threshold = useContractReader(readContracts, "Staker", "threshold")
-  const balanceStaked = useContractReader(readContracts, "Staker", "stakedBalance", [address])
+  // Chains
+  let localChainId = localProvider && localProvider._network && localProvider._network.chainId;
+  let selectedChainId = userProvider && userProvider._network && userProvider._network.chainId;
+
+
+  // Transactors.
+  const tx = Transactor(userProvider, gasPrice);          // Rransactor interface
+  const readContracts = useContractLoader(localProvider); // Read attributes.
+  const writeContracts = useContractLoader(userProvider); // Execute functions and transactions.
+
+
+  // Contracts methods and attributes.
+  const threshold = useContractReader(readContracts, "Staker", "threshold");
+  const balanceStaked = useContractReader(readContracts, "Staker", "stakedBalance", [address]);
   const stakeEvents = useEventListener(readContracts, "Staker", "Stake", localProvider, 1);
   const withdrawEvents = useEventListener(readContracts, "ExampleExternalContract", "stakeWithdrawed", localProvider, 2);
-  const timeLeft = useContractReader(readContracts, "Staker", "timeLeft")
-  const complete = useContractReader(readContracts, "Staker", "completed")
+  const timeLeft = useContractReader(readContracts, "Staker", "timeLeft");
+  const complete = useContractReader(readContracts, "Staker", "completed");
   const stakerContractBalance = useBalance(localProvider, readContracts && readContracts.Staker.address);
   const exampleExternalContractBalance = useContractReader(readContracts, "ExampleExternalContract", "lastStackValue");
 
 
+  // Web3 Modal.
   const loadWeb3Modal = useCallback(async () => {
     const provider = await web3Modal.connect();
     setInjectedProvider(new Web3Provider(provider));
@@ -71,6 +81,7 @@ function App(props) {
   }, [setRoute]);
 
 
+  // Light "components".
   let completeDisplay = ""
   if (complete) {
     completeDisplay = (
@@ -116,6 +127,7 @@ function App(props) {
     )
   }
 
+  // Main app render.
   return (
     <div className="App container">
 
@@ -283,9 +295,8 @@ function App(props) {
 }
 
 
-/*
-  Web3 modal helps us "connect" external wallets:
-*/
+
+// Web3 modals helps us "connect" external wallets:
 const web3Modal = new Web3Modal({
   // network: "mainnet", // optional
   cacheProvider: true, // optional
@@ -306,6 +317,7 @@ const logoutOfWeb3Modal = async () => {
   }, 1);
 };
 
+// Reload on chain changed.
 window.ethereum && window.ethereum.on('chainChanged', chainId => {
   setTimeout(() => {
     window.location.reload();
