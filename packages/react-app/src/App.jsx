@@ -3,7 +3,7 @@ import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
 import "antd/dist/antd.css";
 import "bootstrap/dist/css/bootstrap.css";
 import ProgressBar from 'react-bootstrap/ProgressBar';
-import {  JsonRpcProvider, Web3Provider } from "@ethersproject/providers";
+import { JsonRpcProvider, Web3Provider } from "@ethersproject/providers";
 import "./App.css";
 import { Row, Col, Button, Menu, Alert, List } from "antd";
 import Web3Modal from "web3modal";
@@ -55,7 +55,7 @@ const localProviderUrl = targetNetwork.rpcUrl;
 
 // as you deploy to other networks you can set REACT_APP_PROVIDER=https://dai.poa.network in packages/react-app/.env
 const localProviderUrlFromEnv = process.env.REACT_APP_PROVIDER ? process.env.REACT_APP_PROVIDER : localProviderUrl;
-if(DEBUG) console.log("🏠 Connecting to provider:", localProviderUrlFromEnv);
+console.log("🏠 Connecting to provider:", localProviderUrlFromEnv);
 const localProvider = new JsonRpcProvider(localProviderUrlFromEnv);
 
 // 🔭 block explorer URL
@@ -68,18 +68,18 @@ function App(props) {
   const price = useExchangePrice(targetNetwork, mainnetProvider);
 
   /* 🔥 This hook will get the price of Gas from ⛽️ EtherGasStation */
-  const gasPrice = useGasPrice(targetNetwork,"fast");
+  const gasPrice = useGasPrice(targetNetwork, "fast");
   // Use your injected provider from 🦊 Metamask or if you don't have it then instantly generate a 🔥 burner wallet.
   const userProvider = useUserProvider(injectedProvider, localProvider);
   const address = useUserAddress(userProvider);
-  if(DEBUG) console.log("👩‍💼 selected address:",address)
+  if (DEBUG) console.log("👩‍💼 selected address:", address)
 
   // You can warn the user if you would like them to be on a specific network
   let localChainId = localProvider && localProvider._network && localProvider._network.chainId
-  if(DEBUG) console.log("🏠 localChainId",localChainId)
+  if (DEBUG) console.log("🏠 localChainId", localChainId)
 
   let selectedChainId = userProvider && userProvider._network && userProvider._network.chainId
-  if(DEBUG) console.log("🕵🏻‍♂️ selectedChainId:",selectedChainId)
+  if (DEBUG) console.log("🕵🏻‍♂️ selectedChainId:", selectedChainId)
 
   // For more hooks, check out 🔗eth-hooks at: https://www.npmjs.com/package/eth-hooks
 
@@ -91,19 +91,19 @@ function App(props) {
 
   // 🏗 scaffold-eth is full of handy hooks like this one to get your balance:
   const yourLocalBalance = useBalance(localProvider, address);
-  if(DEBUG) console.log("💵 yourLocalBalance",yourLocalBalance?formatEther(yourLocalBalance):"...")
+  if (DEBUG) console.log("💵 yourLocalBalance", yourLocalBalance ? formatEther(yourLocalBalance) : "...")
 
   // Just plug in different 🛰 providers to get your balance on different chains:
   const yourMainnetBalance = useBalance(mainnetProvider, address);
-  if(DEBUG) console.log("💵 yourMainnetBalance",yourMainnetBalance?formatEther(yourMainnetBalance):"...")
+  if (DEBUG) console.log("💵 yourMainnetBalance", yourMainnetBalance ? formatEther(yourMainnetBalance) : "...")
 
   // Load in your local 📝 contract and read a value from it:
   const readContracts = useContractLoader(localProvider)
-  if(DEBUG) console.log("📝 readContracts",readContracts)
+  if (DEBUG) console.log("📝 readContracts", readContracts)
 
   // If you want to make 🔐 write transactions to your contracts, use the userProvider:
   const writeContracts = useContractLoader(userProvider)
-  if(DEBUG) console.log("🔐 writeContracts",writeContracts)
+  if (DEBUG) console.log("🔐 writeContracts", writeContracts)
 
   // EXTERNAL CONTRACT EXAMPLE:
   //
@@ -116,44 +116,44 @@ function App(props) {
   //
 
   // keep track of contract balance to know how much has been staked total:
-  
 
-  const threshold = useContractReader(readContracts,"Staker", "threshold" )
 
-  const balanceStaked = useContractReader(readContracts, "Staker", "stakedBalance", [ address ])
+  const threshold = useContractReader(readContracts, "Staker", "threshold")
+
+  const balanceStaked = useContractReader(readContracts, "Staker", "stakedBalance", [address])
 
   const stakeEvents = useEventListener(readContracts, "Staker", "Stake", localProvider, 1);
   const withdrawEvents = useEventListener(readContracts, "ExampleExternalContract", "stakeWithdrawed", localProvider, 2);
 
-  const timeLeft = useContractReader(readContracts,"Staker", "timeLeft")
+  const timeLeft = useContractReader(readContracts, "Staker", "timeLeft")
 
-  const complete = useContractReader(readContracts,"Staker", "completed")
+  const complete = useContractReader(readContracts, "Staker", "completed")
 
   const stakerContractBalance = useBalance(localProvider, readContracts && readContracts.Staker.address);
-  if(DEBUG) console.log("💵 stakerContractBalance", stakerContractBalance )
+  if (DEBUG) console.log("💵 stakerContractBalance", stakerContractBalance)
 
-  const exampleExternalContractBalance = useContractReader(readContracts,"ExampleExternalContract", "lastStackValue");
-  if(DEBUG) console.log("💵 exampleExternalContractBalance", exampleExternalContractBalance )
+  const exampleExternalContractBalance = useContractReader(readContracts, "ExampleExternalContract", "lastStackValue");
+  if (DEBUG) console.log("💵 exampleExternalContractBalance", exampleExternalContractBalance)
 
 
   let completeDisplay = ""
-  if(complete){
+  if (complete) {
     completeDisplay = (
-        <div style={{paddingTop:30, color: "white", backgroundColor:"#0d6efd", fontWeight:"bolder"}}>
-          🚀 🎖 👩‍🚀  -  ¡Ethereum Staked!  -  🎉 🍾 🎊
-          <br />
-          <Balance
-            balance={exampleExternalContractBalance}
-            fontSize={64}
-          />
-          <br />
-          <div style={{padding:30, color: "white"}}>
-             ETH staked and sent to External Contract!
-          </div>
-          <div style={{padding:30, color: "white", backgroundColor:"#a83246"}}>
-            Staking period finished! No more staking.. for now!
-          </div>
+      <div style={{ paddingTop: 30, color: "white", backgroundColor: "#0d6efd", fontWeight: "bolder" }}>
+        🚀 🎖 👩‍🚀  -  ¡Ethereum Staked!  -  🎉 🍾 🎊
+        <br />
+        <Balance
+          balance={exampleExternalContractBalance}
+          fontSize={64}
+        />
+        <br />
+        <div style={{ padding: 30, color: "white" }}>
+          ETH staked and sent to External Contract!
         </div>
+        <div style={{ padding: 30, color: "white", backgroundColor: "#a83246" }}>
+          Staking period finished! No more staking.. for now!
+        </div>
+      </div>
     )
   }
 
@@ -163,9 +163,9 @@ function App(props) {
   console.log("🏷 Resolved austingriffith.eth as:",addressFromENS);
   */
   let networkDisplay = ""
-  if(localChainId && selectedChainId && localChainId != selectedChainId ){
+  if (localChainId && selectedChainId && localChainId != selectedChainId) {
     networkDisplay = (
-      <div style={{zIndex:2, position:'absolute', right:0,top:60,padding:16}}>
+      <div style={{ zIndex: 2, position: 'absolute', right: 0, top: 60, padding: 16 }}>
         <Alert
           message={"⚠️ Wrong Network"}
           description={(
@@ -180,7 +180,7 @@ function App(props) {
     )
   } else {
     networkDisplay = (
-      <strong style={{zIndex:2, position:'absolute', right:110, top:10, padding:14, color:targetNetwork.color}}>
+      <strong style={{ zIndex: 2, position: 'absolute', right: 110, top: 10, padding: 14, color: targetNetwork.color }}>
         {targetNetwork.name.toUpperCase()}
       </strong>
     )
@@ -203,11 +203,11 @@ function App(props) {
   }, [setRoute]);
 
   let faucetHint = ""
-  const [ faucetClicked, setFaucetClicked ] = useState( false );
-    if(!faucetClicked&&localProvider&&localProvider._network&&localProvider._network.chainId==31337&&yourLocalBalance&&formatEther(yourLocalBalance)<=0){
+  const [faucetClicked, setFaucetClicked] = useState(false);
+  if (!faucetClicked && localProvider && localProvider._network && localProvider._network.chainId == 31337 && yourLocalBalance && formatEther(yourLocalBalance) <= 0) {
     faucetHint = (
-      <div style={{padding:16}}>
-        <Button type={"primary"} onClick={()=>{
+      <div style={{ padding: 16 }}>
+        <Button type={"primary"} onClick={() => {
           faucetTx({
             to: address,
             value: parseEther("0.01"),
@@ -219,7 +219,7 @@ function App(props) {
       </div>
     )
   }
-  
+
   return (
     <div className="App container">
 
@@ -230,16 +230,16 @@ function App(props) {
         <Switch>
           <Route exact path="/">
 
-          {completeDisplay}
+            {completeDisplay}
 
             <div className="d-flex flex-row flex-wrap justify-content-around mb-5">
               <div className="pol mb-1">
-                <div style={{padding:8,marginTop:32}}>
+                <div style={{ padding: 8, marginTop: 32 }}>
                   <div>Time Left:</div>
-                  {timeLeft && humanizeDuration(timeLeft.toNumber()*1000)}
+                  {timeLeft && humanizeDuration(timeLeft.toNumber() * 1000)}
                 </div>
 
-                <div style={{padding:8}}>
+                <div style={{ padding: 8 }}>
                   <div>Total staked in Staker Contract:</div>
                   <Balance
                     balance={stakerContractBalance}
@@ -251,33 +251,33 @@ function App(props) {
                 </div>
 
                 <div>
-                  <ProgressBar  now={stakerContractBalance ? stakerContractBalance / threshold : 0} max="1" />
+                  <ProgressBar now={stakerContractBalance ? stakerContractBalance / threshold : 0} max="1" />
                 </div>
               </div>
 
               <div className="pol">
-                <div style={{padding:8}}>
+                <div style={{ padding: 8 }}>
                   <div>You staked:</div>
                   <Balance balance={balanceStaked} fontSize={64} />
                 </div>
 
                 <div className="d-flex flex-row justify-content-center flex-wrap">
 
-                  <div style={{paddingRight:8}}>
-                    <Button className="button btn-warning" disabled={!web3Modal.cachedProvider  || complete || timeLeft == 0 ? true : false} type={"default"} onClick={()=>{
-                      tx( writeContracts.Staker.execute() )
+                  <div style={{ paddingRight: 8 }}>
+                    <Button className="button btn-warning" disabled={!web3Modal.cachedProvider || complete || timeLeft == 0 ? true : false} type={"default"} onClick={() => {
+                      tx(writeContracts.Staker.execute())
                     }}>📡 Execute!</Button>
                   </div>
 
-                  <div style={{paddingRight:8}}>
-                    <Button className="button btn-primary" disabled={!web3Modal.cachedProvider ? true : false} onClick={()=>{
-                      tx( writeContracts.Staker.stake({value: parseEther("0.1")}) )
+                  <div style={{ paddingRight: 8 }}>
+                    <Button className="button btn-primary" disabled={!web3Modal.cachedProvider ? true : false} onClick={() => {
+                      tx(writeContracts.Staker.stake({ value: parseEther("0.1") }))
                     }}>🥩 Stake 0.1 ether!</Button>
                   </div>
 
                   <div>
-                    <Button  className="button btn-danger" disabled={!web3Modal.cachedProvider  || !complete || timeLeft != 0 ? true : false} onClick={()=>{
-                      tx( writeContracts.Staker.withdraw( address ) )
+                    <Button className="button btn-danger" disabled={!web3Modal.cachedProvider || !complete || timeLeft != 0 ? true : false} onClick={() => {
+                      tx(writeContracts.Staker.withdraw(address))
                     }}>🏧 Withdraw</Button>
                   </div>
 
@@ -285,7 +285,7 @@ function App(props) {
                 {web3Modal.cachedProvider ? "" :
                   <div className="mt-3 text-warning">
                     You must <span className="text-white">connect</span> before doing any operation.
-                   </div>
+                  </div>
                 }
               </div>
             </div>
@@ -298,51 +298,51 @@ function App(props) {
             <hr />
 
             <div className="d-flex flex-row justify-content-between flex-wrap">
-              <div style={{minWidth:500, margin:"auto", marginTop:20}}>
+              <div style={{ minWidth: 500, margin: "auto", marginTop: 20 }}>
                 <div>Stake Events:</div>
-                <List className="color-white" id="list" 
+                <List className="color-white" id="list"
                   dataSource={stakeEvents}
                   renderItem={(item) => {
                     return (
                       <List.Item key={item[0] + item[1] + item.blockNumber}>
                         <Address
-                            value={item[0]}
-                            ensProvider={mainnetProvider}
-                            fontSize={16}
-                            size={"short"}
-                          /> 
-                          <Balance
-                            balance={item[1]}
-                          />
+                          value={item[0]}
+                          ensProvider={mainnetProvider}
+                          fontSize={16}
+                          size={"short"}
+                        />
+                        <Balance
+                          balance={item[1]}
+                        />
                       </List.Item>
                     )
                   }}
                 />
               </div>
 
-              <div style={{minWidth:500, margin:"auto", marginTop:20}}>
+              <div style={{ minWidth: 500, margin: "auto", marginTop: 20 }}>
                 <div>Withdrawal Events:</div>
-                <List style={{color: "white"}} id="list" 
+                <List style={{ color: "white" }} id="list"
                   dataSource={withdrawEvents}
                   renderItem={(item) => {
                     return (
                       <List.Item key={item[0] + item[1] + item.blockNumber}>
                         <Address
-                            value={item[0]}
-                            ensProvider={mainnetProvider}
-                            fontSize={16}
-                            size={"short"}
-                          /> 
-                          <Balance
-                            balance={item[1]}
-                          />
+                          value={item[0]}
+                          ensProvider={mainnetProvider}
+                          fontSize={16}
+                          size={"short"}
+                        />
+                        <Balance
+                          balance={item[1]}
+                        />
                       </List.Item>
                     )
                   }}
                 />
               </div>
             </div>
-            <Link onClick={()=>{setRoute("/admin")}} to="/admin">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</Link>
+            <Link onClick={() => { setRoute("/admin") }} to="/admin">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</Link>
           </Route>
 
           <Route path="/admin">
@@ -363,31 +363,31 @@ function App(props) {
             />
 
           </Route>
-          
+
         </Switch>
       </BrowserRouter>
 
       {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
       <div style={{ position: "fixed", textAlign: "right", right: 0, top: 0, padding: 10 }} >
-         <Account
-           address={address}
-           localProvider={localProvider}
-           userProvider={userProvider}
-           mainnetProvider={mainnetProvider}
-           price={price}
-           web3Modal={web3Modal}
-           loadWeb3Modal={loadWeb3Modal}
-           logoutOfWeb3Modal={logoutOfWeb3Modal}
-           blockExplorer={blockExplorer}
-         />
-         {/*faucetHint*/}
+        <Account
+          address={address}
+          localProvider={localProvider}
+          userProvider={userProvider}
+          mainnetProvider={mainnetProvider}
+          price={price}
+          web3Modal={web3Modal}
+          loadWeb3Modal={loadWeb3Modal}
+          logoutOfWeb3Modal={logoutOfWeb3Modal}
+          blockExplorer={blockExplorer}
+        />
+        {/*faucetHint*/}
       </div>
 
-      <div style={{paddingTop:40}}>Created by <a href="https://frenzoid.dev" target="_blank">MrFrenzoid</a>
-          <p>If you like what you see, feel free to donate any KETH you have for spare, it will help me learn more about how to craft cool things like this :) </p>
-          <span style={{color:"magenta"}}>0x7030f4D0dC092449E4868c8DDc9bc00a14C9f561</span>
-          <span> or </span>
-          <span style={{color:"cyan"}}> 0x03B4695062564D30F34bD9586fbC3262d1C30565</span>
+      <div style={{ paddingTop: 40 }}>Created by <a href="https://frenzoid.dev" target="_blank">MrFrenzoid</a>
+        <p>If you like what you see, feel free to donate any KETH you have for spare, it will help me learn more about how to craft cool things like this :) </p>
+        <span style={{ color: "magenta" }}>0x7030f4D0dC092449E4868c8DDc9bc00a14C9f561</span>
+        <span> or </span>
+        <span style={{ color: "cyan" }}> 0x03B4695062564D30F34bD9586fbC3262d1C30565</span>
       </div>
 
       { /*<div style={{marginTop:32,opacity:0.5}}><a target="_blank" style={{padding:32,color:"#000"}} href="https://github.com/austintgriffith/scaffold-eth">🍴 Fork me!</a></div> */}
@@ -460,7 +460,7 @@ const logoutOfWeb3Modal = async () => {
   }, 1);
 };
 
- window.ethereum && window.ethereum.on('chainChanged', chainId => {
+window.ethereum && window.ethereum.on('chainChanged', chainId => {
   setTimeout(() => {
     window.location.reload();
   }, 1);

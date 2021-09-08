@@ -54,7 +54,7 @@ module.exports = {
       },
     },
     kovan: {
-      url: "https://kovan.infura.io/v3/2cf91c8e5f324f4c893e17928e0e1c19", //<---- YOUR INFURA ID! (or it won't work) UPDATED FRENZOID 2021
+      url: "https://speedy-nodes-nyc.moralis.io/9622cad71da77fb2121a65ae/eth/kovan", //<---- YOUR INFURA ID! (or it won't work) UPDATED FRENZOID 2021
       accounts: {
         mnemonic: mnemonic(),
       },
