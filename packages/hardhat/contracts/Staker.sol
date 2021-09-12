@@ -71,7 +71,7 @@ contract Staker is Ownable {
         stakersCount = 0;
         threshold = 1 ether;
         completed = false;
-        deadline = block.timestamp + 15 minutes;
+        deadline = block.timestamp + 30 seconds;
     }
 
     /// - Public methods.

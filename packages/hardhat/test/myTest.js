@@ -76,7 +76,7 @@ describe('Staker dApp', () => {
       expect(contractBalance).to.equal(amount);
 
       // Check that the contract has stored in our balances state the correct amount
-      const addr1Balance = await stakerContract.balances(addr1.address);
+      const addr1Balance = await stakerContract.stakedBalance(addr1.address);
       expect(addr1Balance).to.equal(amount);
     });
 
@@ -94,7 +94,7 @@ describe('Staker dApp', () => {
       expect(contractBalance).to.equal(amount);
 
       // Check that the contract has stored in our balances state the correct amount
-      const addr1Balance = await stakerContract.balances(addr1.address);
+      const addr1Balance = await stakerContract.stakedBalance(addr1.address);
       expect(addr1Balance).to.equal(amount);
     });
 
@@ -107,7 +107,7 @@ describe('Staker dApp', () => {
         stakerContract.connect(addr1).stake({
           value: amount,
         })
-      ).to.be.revertedWith('Deadline is already reached');
+      ).to.be.revertedWith('DSA: Sorry, the deadile has passed!');
     });
 
     it('Stake reverted if external contract is completed', async () => {
@@ -126,14 +126,14 @@ describe('Staker dApp', () => {
         stakerContract.connect(addr1).stake({
           value: amount,
         })
-      ).to.be.revertedWith('staking process already completed');
+      ).to.be.revertedWith('DSA: Operation is already completed!');
     });
   });
 
   describe('Test execute() method', () => {
     it('execute reverted because stake amount not reached threshold', async () => {
       await expect(stakerContract.connect(addr1).execute()).to.be.revertedWith(
-        'Threshold not reached'
+        "DSA: Can't execute yet, threshold hasn't been met."
       );
     });
 
@@ -145,7 +145,7 @@ describe('Staker dApp', () => {
       await stakerContract.connect(addr1).execute();
 
       await expect(stakerContract.connect(addr1).execute()).to.be.revertedWith(
-        'staking process already completed'
+        'DSA: Operation is already completed!'
       );
     });
 
@@ -154,7 +154,7 @@ describe('Staker dApp', () => {
       await increaseWorldTimeInSeconds(180, true);
 
       await expect(stakerContract.connect(addr1).execute()).to.be.revertedWith(
-        'Deadline is already reached'
+        'DSA: Sorry, the deadile has passed!'
       );
     });
 
@@ -170,7 +170,7 @@ describe('Staker dApp', () => {
       // expect('complete').to.be.calledOnContract(exampleExternalContract);
 
       // check that the external contract is completed
-      const completed = await exampleExternalContract.completed();
+      const completed = await stakerContract.completed();
       expect(completed).to.equal(true);
 
       // check that the external contract has the staked amount in it's balance
@@ -191,7 +191,7 @@ describe('Staker dApp', () => {
     it('Withdraw reverted if deadline is not reached', async () => {
       await expect(
         stakerContract.connect(addr1).withdraw(addr1.address)
-      ).to.be.revertedWith('Deadline is not reached yet');
+      ).to.be.revertedWith('DSA: You cannot withdraw during the staking period. Wait until the timer is done.');
     });
 
     it('Withdraw reverted if external contract is completed', async () => {
@@ -210,7 +210,7 @@ describe('Staker dApp', () => {
 
       await expect(
         stakerContract.connect(addr1).withdraw(addr1.address)
-      ).to.be.revertedWith('staking process already completed');
+      ).to.be.revertedWith('DSA: Operation is already completed!"');
     });
 
     it('Withdraw reverted if address has no balance', async () => {
@@ -219,7 +219,7 @@ describe('Staker dApp', () => {
 
       await expect(
         stakerContract.connect(addr1).withdraw(addr1.address)
-      ).to.be.revertedWith("You don't have balance to withdraw");
+      ).to.be.revertedWith("DSA: You dont have funds staked to withdraw.");
     });
 
     it('Withdraw success!', async () => {

@@ -24,7 +24,7 @@ contract ExampleExternalContract is Ownable {
         lastStackValue = 0;
     }
 
-    /// - Public methods.
+    ///. - Public methods.
     function complete() public payable {
         lastStackValue = address(this).balance;
 
